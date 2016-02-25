@@ -6,7 +6,10 @@ There's a proper article coming soon, but for now this read me will have to do.
 ##What it does
 + Performs automated tests for components and pages against all of the available templates.
 + It uses the Microsoft Visual Studio UnitTesting library to run "unit tests" against items and their templates using the Tridion core service.
-+ The test project uses runsettings so it can be run against multiple environments either in Visual Studio or using vstest.console.exe (e.g. vstest.console.exe" "%WORKSPACE%\Website\Tridion.Template.Tests\bin\Debug\Tridion.Templates.Tests.dll" /Settings:"%WORKSPACE%\Tridion.Template.Tests\RunSettings\local.runsettings" /Logger:trx)
++ The test project uses runsettings so it can be run against multiple environments either in Visual Studio or using vstest.console.exe. For example
+```
+ vstest.console.exe" "%WORKSPACE%\Website\Tridion.Template.Tests\bin\Debug\Tridion.Templates.Tests.dll" /Settings:"%WORKSPACE%\Tridion.Template.Tests\RunSettings\local.runsettings" /Logger:trx)
+ ```
 + You can integrate it with Jenkins or [insert your perfered CI server] to automate the testing process.
 + You'll get nice output like this:
 
