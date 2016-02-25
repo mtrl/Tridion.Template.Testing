@@ -18,20 +18,20 @@ There's a proper article coming soon, but for now this read me will have to do.
 ![](https://raw.githubusercontent.com/mtrl/Tridion.Template.Testing/master/Images/console-output.jpg)
 
 ##How to use it
-1. In your Tridion CM, create a Test folder in your desired publication, in here copy or create the components with the content that you want to test. A combination of components with and without all mandatory fields is a good start.
++ In your Tridion CM, create a Test folder in your desired publication, in here copy or create the components with the content that you want to test. A combination of components with and without all mandatory fields is a good start.
 
 ![](https://raw.githubusercontent.com/mtrl/Tridion.Template.Testing/master/Images/component-test-folder.jpg)
 
-2. In your Tridion CM, create a Test structure group in your desired publication. This this SG create the pages that you want to test.
++ In your Tridion CM, create a Test structure group in your desired publication. This this SG create the pages that you want to test.
 
 ![](https://raw.githubusercontent.com/mtrl/Tridion.Template.Testing/master/Images/page-test-folder.jpg)
 
-3. Open the project in Visual Studio and open the RunSettings/*.runsettings file
++ Open the project in Visual Studio and open the RunSettings/*.runsettings file
 
 ![](https://raw.githubusercontent.com/mtrl/Tridion.Template.Testing/master/Images/runsettings.jpg)
 
-4. Change the values in this file to reflect your testing environment's set up
++ Change the values in this file to reflect your testing environment's set up
 
-5. In the Test Explorer window, click the "Run all" button and watch in amazement as your templates are tested for you
++ In the Test Explorer window, click the "Run all" button and watch in amazement as your templates are tested for you
 
 ![](https://raw.githubusercontent.com/mtrl/Tridion.Template.Testing/master/Images/run-all.jpg)
