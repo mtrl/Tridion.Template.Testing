@@ -1,0 +1,6 @@
+C:\Development\Tridion.Template.Testing\bin\Debug\Tridion.Template.Testing.dll.config
+C:\Development\Tridion.Template.Testing\bin\Debug\Tridion.Template.Testing.dll
+C:\Development\Tridion.Template.Testing\bin\Debug\Tridion.Template.Testing.pdb
+C:\Development\Tridion.Template.Testing\obj\Debug\Tridion.Template.Testing.dll
+C:\Development\Tridion.Template.Testing\obj\Debug\Tridion.Template.Testing.pdb
+C:\Development\Tridion.Template.Testing\obj\Debug\Tridion.Template.Testing.csprojResolveAssemblyReference.cache

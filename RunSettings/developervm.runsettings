@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <ResultsDirectory>../TestResults</ResultsDirectory>
+  </RunConfiguration>
+  <TestRunParameters>
+    <Parameter name="TridionUsername" value="Administrator" />
+    <Parameter name="TridionPassword" value="password"/>
+    <Parameter name="ComponentsOrgItemId" value="tcm:15-543-2"/>
+    <Parameter name="PagesOrgItemId" value=""/>
+    <Parameter name="TestPublicationId" value="tcm:0-23-1"/>
+    <Parameter name="TemplatePublicationId" value="tcm:0-21-1"/>
+  </TestRunParameters>
+</RunSettings>
