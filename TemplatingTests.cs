@@ -18,13 +18,14 @@ namespace Tridion.Template.Testing
     [TestClass]
     public class TemplatingTests
     {
+
         private SessionAwareCoreServiceClient _client;
         private TestContext testContextInstance;
         private Stopwatch stopwatch;
+        private List<string> renderedTemplates;
 
         /// <summary>
-        /// Get a Core Service client object.
-        /// This is lifted from Alex Klock @ http://codedweapon.com/2013/03/changing-components-schemas-with-core-service/
+        /// Get a Core Service client object
         /// </summary>
         public SessionAwareCoreServiceClient Client
         {
@@ -55,7 +56,7 @@ namespace Tridion.Template.Testing
 
         public TemplatingTests()
         {
-            // Let's have some metrics for the tests
+            renderedTemplates = new List<string>();
             stopwatch = new Stopwatch();
         }
 
@@ -97,6 +98,7 @@ namespace Tridion.Template.Testing
                         // Render the component with the component template
                         this.AssertItemRendersWithoutException(component, componentTemplate);
                     }
+                    this.renderedTemplates.Clear();
 
                     this.LogMessage("PASSED! :)");
                 }
@@ -124,6 +126,7 @@ namespace Tridion.Template.Testing
 
                     this.LogMessage("PASSED! :)");
                 }
+                this.renderedTemplates.Clear();
             }
         }
 
@@ -144,13 +147,15 @@ namespace Tridion.Template.Testing
         private IEnumerable<XNode> GetUsingComponentTemplates(ComponentData component)
         {
             SchemaData componentSchema = GetComponentSchema(component.Schema.IdRef);
+            LogMessage("The component's schema ID is " +  componentSchema.Id);
             UsingItemsFilterData usingFilter = new UsingItemsFilterData();
             usingFilter.ItemTypes = new[] { ItemType.ComponentTemplate };
             usingFilter.IncludedVersions = VersionCondition.OnlyLatestVersions;
-            LinkToRepositoryData contextRepository = new LinkToRepositoryData()
-            {
-                IdRef = TestContext.Properties["TemplatePublicationId"].ToString()
-            };
+
+            //LinkToRepositoryData contextRepository = new LinkToRepositoryData()
+            //{
+            //    IdRef = TestContext.Properties["TemplatePublicationId"].ToString()
+            //};
             //usingFilter.InRepository = contextRepository;
 
             return Client.GetListXml(componentSchema.Id, usingFilter).Nodes();
@@ -158,36 +163,49 @@ namespace Tridion.Template.Testing
 
         private void AssertItemRendersWithoutException(IdentifiableObjectData item, IdentifiableObjectData template)
         {
-            RenderedItemData renderedItem = new RenderedItemData();
-            try
+            string testPublicationId = TestContext.Properties["TestPublicationId"].ToString();
+
+            string localisedItemId = Client.GetTcmUri(item.Id, testPublicationId, null);
+            string localisedTemplateId = Client.GetTcmUri(template.Id, testPublicationId, null);
+
+            // We check if the template exists at this publication level as the schema where used query 
+            // might give us templates that might only exist elsewhere in the blueprint
+            if (Client.IsExistingObject(localisedTemplateId) && !this.renderedTemplates.Contains(localisedTemplateId))
             {
-                string testPublicationId = TestContext.Properties["TestPublicationId"].ToString();
-                string localisedItemId = Client.GetTcmUri(item.Id, testPublicationId, null);
+                try
+                {
+                    this.renderedTemplates.Add(localisedTemplateId);
+                    RenderedItemData renderedItem = new RenderedItemData();
 
-                string localisedTemplateId = Client.GetTcmUri(template.Id, TestContext.Properties["TestPublicationId"].ToString(), null);
+                    RenderInstructionData renderInstruction = new RenderInstructionData();
+                    renderInstruction.RenderMode = RenderMode.PreviewStatic;
 
-                RenderInstructionData renderInstruction = new RenderInstructionData();
-                renderInstruction.RenderMode = RenderMode.PreviewStatic;
-            
-                PublishInstructionData previewInstruction = new PublishInstructionData();
-                ResolveInstructionData resolveInstruction = new ResolveInstructionData();
-            
-                previewInstruction.RenderInstruction = renderInstruction;
-                previewInstruction.ResolveInstruction = resolveInstruction;
+                    PublishInstructionData previewInstruction = new PublishInstructionData();
+                    ResolveInstructionData resolveInstruction = new ResolveInstructionData();
 
-                stopwatch.Restart();
-                renderedItem = Client.RenderItem(localisedItemId, localisedTemplateId, previewInstruction, "tcm:0-1-65537");
-                long timeToRender = stopwatch.ElapsedMilliseconds;
-                string renderedContent = System.Text.Encoding.Default.GetString(renderedItem.Content);
-                this.LogMessage(String.Format("Rendering with template \"{0}\" ({1}) succeeded and took {2} milliseconds.", template.Title, localisedTemplateId, timeToRender));
+                    previewInstruction.RenderInstruction = renderInstruction;
+                    previewInstruction.ResolveInstruction = resolveInstruction;
 
-                Assert.IsNotNull(renderedContent);
-            }
-            catch (System.ServiceModel.FaultException ex)
-            {
-                string failMessage = String.Format("TEST FAILED! Failed when rendering item {0} ({1}) with template {2} ({3}) {4}. Exception: {5}", item.Id, item.Title, template.Id, template.Title, Environment.NewLine + Environment.NewLine, ex.Message);
-                this.LogMessage(failMessage);
-                Assert.Fail(failMessage);
+                    stopwatch.Restart();
+                    renderedItem = Client.RenderItem(localisedItemId, localisedTemplateId, previewInstruction, "tcm:0-1-65537");
+                    long timeToRender = stopwatch.ElapsedMilliseconds;
+                    if (renderedItem.Content != null)
+                    {
+                        string renderedContent = System.Text.Encoding.Default.GetString(renderedItem.Content);
+                        this.LogMessage(String.Format("Rendering with template \"{0}\" ({1}) succeeded and took {2} milliseconds.", template.Title, localisedTemplateId, timeToRender));
+                        Assert.IsNotNull(renderedContent);
+                    }
+                    else
+                    {
+                        this.LogMessage(String.Format("ALERT: Rendering with template \"{0}\" ({1}) resulted in null content and took {2} milliseconds.", template.Title, localisedTemplateId, timeToRender));
+                    }
+                }
+                catch (System.ServiceModel.FaultException ex)
+                {
+                    string failMessage = String.Format("TEST FAILED! Failed when rendering item {0} ({1}) with template {2} ({3}) {4}. Exception: {5}", item.Id, item.Title, template.Id, template.Title, Environment.NewLine + Environment.NewLine, ex.Message);
+                    this.LogMessage(failMessage);
+                    Assert.Fail(failMessage);
+                }
             }
         }
 
